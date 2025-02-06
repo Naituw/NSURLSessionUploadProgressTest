@@ -21,9 +21,6 @@
     if (!_session) {
         __auto_type config = [NSURLSessionConfiguration defaultSessionConfiguration];
         
-        // the request will timeout after about 10 seconds, due to the progress became 100% at the begining and not updating then
-        config.timeoutIntervalForRequest = 10;
-        
         _session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     }
     return _session;
@@ -45,6 +42,9 @@
     
     __auto_type request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:endpoint]];
     request.HTTPMethod = @"POST";
+    
+    // 💥 the request will timeout after about 10 seconds, due to the progress became 100% at the begining and not updating then
+    request.timeoutInterval = 10;
     
     _task = [self.session uploadTaskWithRequest:request fromData:data];
     
