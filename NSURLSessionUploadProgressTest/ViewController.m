@@ -26,6 +26,10 @@
     return _session;
 }
 
+static NSInteger UnixTimestampMs(void) {
+    return (int64_t)((CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970) * 1000); /* milliseconds */
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -48,7 +52,7 @@
     
     _task = [self.session uploadTaskWithRequest:request fromData:data];
     
-    NSLog(@"!!! task(%p) resume", _task);
+    NSLog(@"!!! time: %zd, task(%lu) start", UnixTimestampMs(), _task.taskIdentifier);
 
     [_task resume];
 }
@@ -56,15 +60,15 @@
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
 {
     __auto_type progress = (double)totalBytesSent / totalBytesExpectedToSend * 100;
-    NSLog(@"!!! task(%p) progress: %f%% (%lld/%lld)", task, progress, totalBytesSent, totalBytesExpectedToSend);
+    NSLog(@"!!! time: %zd, task(%lu) progress: %f%% (%lld/%lld)", UnixTimestampMs(), task.taskIdentifier, progress, totalBytesSent, totalBytesExpectedToSend);
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
     if (error) {
-        NSLog(@"!!! task(%p) failed with error: %@", task, error);
+        NSLog(@"!!! time: %zd, task(%lu) failed with error: %@", UnixTimestampMs(), task.taskIdentifier, error);
     } else {
-        NSLog(@"!!! task(%p) finished", task);
+        NSLog(@"!!! time: %zd, task(%lu) finished", UnixTimestampMs(), task.taskIdentifier);
     }
 }
 
